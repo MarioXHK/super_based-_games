@@ -36,12 +36,18 @@ class fireball:
         self.x = following.x
         self.y = following.y
         self.angle = off
-    def step(self, following, what):
-        self.angle += 1/1080
+        self.what = 20
+        self.am = 2
+        self.tx = 0
+        self.ty = 0
+        self.sx = 100
+        self.sy = 100
+    def step(self, following):
+        self.angle += self.am/360
         
-        radians = self.angle*what/3.14
+        radians = self.angle*self.what/3.14
         
-        self.x = 100*math.cos(radians)+following.x
-        self.y = 100*math.sin(radians)+following.y
+        self.x = self.sx*math.cos(radians+self.tx)+following.x
+        self.y = self.sy*math.sin(radians+self.ty)+following.y
     def draw(self,scren):
         scren.blit(fire, (self.x, self.y))
