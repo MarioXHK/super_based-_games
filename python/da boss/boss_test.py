@@ -12,7 +12,7 @@ for i in range(balls):
     fire.append(boss.fireball(youknowwho,j))
 gaming = True
 thing = 0
-style = 1
+style = 12
 stylevarA = 1
 stylevarB = 0
 
@@ -26,8 +26,8 @@ while gaming:
         if event.type == pygame.QUIT:
             gaming = False
     clock.tick(60)
-    youknowwho.step(0)
-    if True:
+    youknowwho.step(1)
+    if False:
         if thing > 136:
             style = 2
         elif thing > 60:
@@ -107,6 +107,102 @@ while gaming:
                     fire[i].what = (0-thing)*(i//2)*10+20
                 fire[i].sx = (i//2)*30+30
                 fire[i].sy = (i//2)*30+30
+            fire[i].step(youknowwho)
+        elif style == 6: # Style 6: Cool Swirl (Accident)
+            if stylevarB < len(fire):
+                if stylevarB < len(fire)/2:
+                    stylevarB += 1
+                    fire[i].sx = len(fire)*10-(i*20)
+                    fire[i].sy = i*20
+                else:
+                    fire[i].sx = i*20
+                    fire[i].sy = len(fire)*10-(i*20)
+            fire[i].step(youknowwho)
+        elif style == 7: # Style 7: Some other cool swirls (Also an Accident)
+            if stylevarB < len(fire):
+                fire[i].am = 2
+                stylevarB += 1
+                if stylevarB < len(fire)/2:
+                    if i % 2 == 1:
+                        fire[i].sy = i*20
+                    else:
+                        fire[i].sy = i*-20
+                else:
+                    fire[i].sy = fire[len(fire)-i].sy
+            fire[i].step(youknowwho)
+        elif style == 8: # Style 8: Have half of the balls orbit counterclock wise
+            if stylevarB < len(fire):
+                stylevarB += 1
+                if i % 2 == 1:
+                    fire[i].am = 0-fire[i].am
+            fire[i].step(youknowwho)
+        elif style == 9: # Style 9: Revolving Horizontally
+            if stylevarB < len(fire):
+                stylevarB += 1
+                if i % 2 == 1:
+                    fire[i].sx = -100
+            else:
+                fire[i].tx = thing/2
+                if stylevarA == 1:
+                    if i % 2 == 1:
+                        fire[i].sx -= 1
+                    else:
+                        fire[i].sx += 1
+                        if fire[i].sx <= -100:
+                            stylevarA = 2
+                elif stylevarA == 2:
+                    if i % 2 == 1:
+                        fire[i].sx += 1
+                        
+                    else:
+                        fire[i].sx -= 1
+                        if fire[i].sx >= 100:
+                            stylevarA = 1
+            fire[i].step(youknowwho)
+        elif style == 10: # Style 10: Revolving Vertically
+            if stylevarB < len(fire):
+                stylevarB += 1
+                if i % 2 == 1:
+                    fire[i].sy = -100
+            else:
+                fire[i].tx = thing/2
+                if stylevarA == 1:
+                    if i % 2 == 1:
+                        fire[i].sy -= 1
+                        
+                    else:
+                        fire[i].sy += 1
+                        if fire[i].sy >= 100:
+                            stylevarA = 2
+                elif stylevarA == 2:
+                    if i % 2 == 1:
+                        fire[i].sy += 1
+                        
+                    else:
+                        fire[i].sy -= 1
+                        if fire[i].sy <= -100:
+                            stylevarA = 1
+        elif style == 11: # Style 11: In and Out
+            if fire[i].sx > 0:
+                stylevarB -= 0.01
+            else:
+                stylevarB += 0.01
+            fire[i].sx += stylevarB
+            fire[i].sy += stylevarB
+            if fire[i].sx > 150:
+                fire[i].sx = 150
+                fire[i].sy = 150
+                stylevarB = 0
+            elif fire[i].sx < -150:
+                fire[i].sx = -150
+                fire[i].sy = -150
+                stylevarB = 0
+            fire[i].step(youknowwho)
+        elif style == 12: # Style 12: E G G
+            if fire[i].y < youknowwho.y:
+                fire[i].sy = 150
+            else:
+                fire[i].sy = 75
             fire[i].step(youknowwho)
     screen.fill((200,200,200))
     youknowwho.draw(screen)
