@@ -30,7 +30,7 @@ while gaming:
     clock.tick(60)
     
     
-    # TESTING PURPOSES ONLY, PLEASE REMOVE AFTER!
+    # TESTING PURPOSES ONLY, PLEASE REMOVE AFTER YEETING INTO MAIN PROJECT!
     
     youknowwho.hp -= 0.012
     
@@ -41,7 +41,7 @@ while gaming:
     if style != 16:
         youknowwho.step()
     
-    #----------------------------------------------
+    #---------------------------------------------------------------------
     
     if youknowwho.hp <= 0 and bossalive:
         bossalive = False
