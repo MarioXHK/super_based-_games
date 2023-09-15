@@ -1,5 +1,6 @@
 import pygame
 import boss
+import random
 pygame.init()
 clock = pygame.time.Clock()#set up clock
 screen = pygame.display.set_mode((500, 500))
@@ -12,10 +13,11 @@ for i in range(balls):
     fire.append(boss.fireball(youknowwho,j))
 gaming = True
 thing = 0
-style = 12
+style = 16
 stylevarA = 1
 stylevarB = 0
-
+stylevarC = 0
+bossalive = True
 
 
 
@@ -26,16 +28,27 @@ while gaming:
         if event.type == pygame.QUIT:
             gaming = False
     clock.tick(60)
-    youknowwho.step(1)
-    if False:
-        if thing > 136:
-            style = 2
-        elif thing > 60:
-            style = 1
-        elif thing > 40:
-            style = 2
-        elif thing > 20:
-            style = 0
+    
+    
+    # TESTING PURPOSES ONLY, PLEASE REMOVE AFTER!
+    
+    youknowwho.hp -= 0.012
+    
+    if style == 1:
+        if random.randint(1,100) == 100:
+            fire[random.randint(0,(len(fire)-1))].alive = False
+    
+    if style != 16:
+        youknowwho.step()
+    
+    #----------------------------------------------
+    
+    if youknowwho.hp <= 0 and bossalive:
+        bossalive = False
+        style = 13
+    
+    
+    
     
     #styles of fire
     for i in range(len(fire)):
@@ -148,7 +161,7 @@ while gaming:
                         fire[i].sx -= 1
                     else:
                         fire[i].sx += 1
-                        if fire[i].sx <= -100:
+                        if fire[i].sx >= 100:
                             stylevarA = 2
                 elif stylevarA == 2:
                     if i % 2 == 1:
@@ -156,7 +169,7 @@ while gaming:
                         
                     else:
                         fire[i].sx -= 1
-                        if fire[i].sx >= 100:
+                        if fire[i].sx <= -100:
                             stylevarA = 1
             fire[i].step(youknowwho)
         elif style == 10: # Style 10: Revolving Vertically
@@ -169,7 +182,6 @@ while gaming:
                 if stylevarA == 1:
                     if i % 2 == 1:
                         fire[i].sy -= 1
-                        
                     else:
                         fire[i].sy += 1
                         if fire[i].sy >= 100:
@@ -182,6 +194,7 @@ while gaming:
                         fire[i].sy -= 1
                         if fire[i].sy <= -100:
                             stylevarA = 1
+            fire[i].step(youknowwho)
         elif style == 11: # Style 11: In and Out
             if fire[i].sx > 0:
                 stylevarB -= 0.01
@@ -204,9 +217,44 @@ while gaming:
             else:
                 fire[i].sy = 75
             fire[i].step(youknowwho)
+        elif style == 13: # Style 13: Crumbling
+            if fire[i].am < 0:
+                fire[i].am += 0.01
+            else:
+                fire[i].am -= 0.01
+            fire[i].sx += random.randint(-2,1)
+            fire[i].sy += random.randint(-2,1)
+            fire[i].step(youknowwho)
+            if fire[i].am < 0.1 and fire[i].am > -0.1:
+                style = 14
+        elif style == 14: # Style 14: Blowing up
+            fire[i].sx += 5
+            fire[i].sy += 5
+            if abs(fire[i].x) > 800 or abs(fire[i].y) > 800:
+                fire[i].alive = False
+            fire[i].step(youknowwho)
+        elif style == 15: # Style 15: Pengilum or whatever it is
+            fire[i].am = 0
+            fire[i].what = thing
+            fire[i].step(youknowwho)
+        elif style == 16: # Style 16: Preparing!
+            if thing >= 0 and stylevarA == 1:
+                thing = 0
+                stylevarA = 0
+            fire[i].am = 0
+            fire[i].what = thing
+            fire[i].step(youknowwho)
+            if thing >= 20:
+                for j in range(len(fire)):
+                    fire[j].am = 2
+                    fire[j].what = 20
+                style = 1
+                thing = 0
+                stylevarA = 1
     screen.fill((200,200,200))
     youknowwho.draw(screen)
     for i in range(len(fire)):
-        fire[i].draw(screen)
+        if fire[i].alive:
+            fire[i].draw(screen)
     pygame.display.flip()
 pygame.quit()
