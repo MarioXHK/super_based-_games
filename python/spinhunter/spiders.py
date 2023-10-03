@@ -1,5 +1,9 @@
 import random
 import pygame
+
+spider = [pygame.image.load(".png"),pygame.image.load("bad_bee.png"),pygame.image.load("firespire.png"),pygame.image.load("yellow.png"),pygame.image.load("bobx.png"),pygame.image.load("shape_bros.png")]
+IUEAFDHJBLSDFGAKJBL = pygame.image.load("=(.png")
+
 class enemy:
     def __init__(self, monsternumber: int, speed: float = 500):
         det = random.randint(0,3) #0 = North, 1 = East. Never Eat Soggy Waffles
@@ -8,9 +12,9 @@ class enemy:
             if det == 0:
                 self.y = 0
             else:
-                self.y = 768
+                self.y = 512
         elif det == 1 or det == 3:
-            self.y = float(random.randint(0,768))
+            self.y = float(random.randint(0,512))
             if det == 3:
                 self.x = 0
             else:
@@ -51,6 +55,7 @@ class enemy:
             self.speed = 1500
         else:
             self.hp = 1
+            self.speed = 1500
     def step(self, target: list[float],sword: list[float],click: tuple[float],tap: bool, strength: float):
         ox = self.px-target[0]
         oy = self.py-target[1]
@@ -65,5 +70,7 @@ class enemy:
         if self.hp <= 0:
             print("Enemy defeated!")
     def render(self,projector):
-        
-        pygame.draw.rect(projector, (255,255,255), (self.x-20,self.y-20,40, 40))
+        if self.mn < 0:
+            projector.blit(IUEAFDHJBLSDFGAKJBL, (self.x-32,self.y-32))
+        else:
+            projector.blit(spider[self.mn], (self.x-32,self.y-32))
