@@ -1,8 +1,9 @@
 import random
 import pygame
 
-spider = [pygame.image.load(".png"),pygame.image.load("bad_bee.png"),pygame.image.load("firespire.png"),pygame.image.load("yellow.png"),pygame.image.load("bobx.png"),pygame.image.load("shape_bros.png")]
+spider = [pygame.image.load(".png"),pygame.image.load("bad_bee.png"),pygame.image.load("firespire.png"),pygame.image.load("yellow.png"),pygame.image.load("bobx.png"),pygame.image.load("shape_bros.png"),pygame.image.load("1.png"),pygame.image.load("crazy.png"),pygame.image.load("coin.png"),pygame.image.load("them.png"),pygame.image.load("mouse.png")]
 IUEAFDHJBLSDFGAKJBL = pygame.image.load("=(.png")
+circle = pygame.image.load("404.png")
 
 class enemy:
     def __init__(self, monsternumber: int, speed: float = 500):
@@ -39,16 +40,16 @@ class enemy:
             self.hp = 10
             self.speed = 900
         elif monsternumber == 6:
-            self.hp = 1
-            self.speed = 60
+            self.hp = 2
+            self.speed = 120
         elif monsternumber == 7:
-            self.hp = 7
+            self.hp = 12
             self.speed = 900
         elif monsternumber == 8:
-            self.hp = 9
-            self.speed = 900
+            self.hp = 10
+            self.speed = 800
         elif monsternumber == 9:
-            self.hp = 11
+            self.hp = 16
             self.speed = 800
         elif monsternumber == 10:
             self.hp = 30
@@ -72,5 +73,7 @@ class enemy:
     def render(self,projector):
         if self.mn < 0:
             projector.blit(IUEAFDHJBLSDFGAKJBL, (self.x-32,self.y-32))
-        else:
+        elif self.mn < len(spider):
             projector.blit(spider[self.mn], (self.x-32,self.y-32))
+        else:
+            projector.blit(circle, (self.x-32,self.y-32))
