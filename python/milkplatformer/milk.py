@@ -46,7 +46,7 @@ dozooming = False #if true, zooming will be enabled
 
 ground = pygame.image.load('tilesets/ground.png')
 ground = pygame.transform.scale(ground, (400,400))
-players = [player(640,1440,"w")]#THe player you play as
+players = [player(100,100,"w")]#THe player you play as
 p1dom = 1 #How much player 1 has dominance over scrolling
 zoom = 1
 zoomy = 1
@@ -55,8 +55,9 @@ mapID = 0
 map = Maps.getmap(mapID, False)
 print(Mapgen.scanspawn(Maps.getmap(mapID),9))
 
-enemies = [entity(760, 1300,"bluewall"),entity(560, 1300,"slime"),entity(720, 1080,"cherry"),entity(4280, 1480,"cheese"),entity(4280, 1480,"cherry"),entity(4180, 1480,"cherry"),entity(4080, 1480,"cherry"),entity(3980, 1480,"cherry"),entity(3880, 1480,"cherry")]
+enemies = [entity(760, 100,"bluewall"),entity(600, 600,"flyingplatform"),entity(400,  600,"fakeblock"),entity(560, 1300,"slime"),entity(720, 1080,"cherry"),entity(4280, 1480,"cheese"),entity(4280, 1480,"cherry"),entity(4180, 1480,"cherry"),entity(4080, 1480,"cherry"),entity(3980, 1480,"cherry"),entity(3880, 1480,"cherry")]
 
+"""
 for a in range(100):
     enemies.append(entity(random.randint(500,4000), 1300,"cherry"))
 for a in range(200):
@@ -65,6 +66,9 @@ for a in range(400):
     enemies.append(entity(random.randint(500,4000), 1000,"cheese"))
 for o in range(len(players)-1):
     keys.append(keys[0])
+"""
+
+
 for i in range(len(players)):
     players[i].getmap(map)
 for i in range(len(enemies)):
