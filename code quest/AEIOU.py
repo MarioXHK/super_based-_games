@@ -1,10 +1,7 @@
-import sys
-
-
-cases = int(sys.stdin.readline().rstrip())
+cases = int(input())
 
 for i in range(cases):
-    line = sys.stdin.readline().rstrip()
+    line = input()
         
     count = 0
     for i in range(len(line)):

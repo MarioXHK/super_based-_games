@@ -1,9 +1,4 @@
-# Recommended imports for all problems
-# Some problems may require more
-import sys
-import math
-import string
-cases = int(sys.stdin.readline().rstrip())
+cases = int(input())
 for caseNum in range(cases):
     V = float(input())
     X = float(input())

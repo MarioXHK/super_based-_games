@@ -1,16 +1,13 @@
-import sys
-
-
-cases = int(sys.stdin.readline().rstrip())
+cases = int(input())
 
 for i in range(cases):
-    numbers = sys.stdin.readline().rstrip().split(" ")
+    numbers = input().split(" ")
     knownwords = []
     erroneous = []
     for i in range(int(numbers[0])):
-        knownwords.append(sys.stdin.readline().rstrip())
+        knownwords.append(input())
     for j in range(int(numbers[1])):
-        erroneous.append(sys.stdin.readline().rstrip())
+        erroneous.append(input())
     for t in range(len(erroneous)):
         wordhits = []
         for f in knownwords:

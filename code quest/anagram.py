@@ -1,12 +1,3 @@
-#thing = input("hi\n")
-#count = 0
-#for i in range(len(thing)):
-#    if thing[i] in ["a","e","i","o","u"]:
-#        count += 1
-
-
-import sys
-
 alphabet = {
     "a": 0,
     "A": 0,
@@ -64,12 +55,12 @@ alphabet = {
 }
 
 
-cases = int(sys.stdin.readline().rstrip())
+cases = int(input())
 
 for i in range(cases):
     lettercounterA = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     lettercounterB = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    line = sys.stdin.readline().rstrip()
+    line = input()
     print(line)
     line = line.split("|")
         
