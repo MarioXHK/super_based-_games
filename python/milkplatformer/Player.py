@@ -5,9 +5,9 @@ playerduck = pygame.image.load('player/duck.png')
 playertired = pygame.image.load('player/tired.png')
 def rescale(imag):
     return pygame.transform.scale(imag, (80,80))
-playeridle = rescale(playeridle)
 playerduck = rescale(playerduck)
 playertired = pygame.transform.scale(playertired, (64,1216))
+playeridle = pygame.transform.scale(playeridle, (64,1088))
 class player:#THE PLAYER OF THE GAME
     def __init__(self, startx, starty, name = "nul"):
         self.name = name
@@ -86,7 +86,10 @@ class player:#THE PLAYER OF THE GAME
         
         self.state = "idle"
         #The state of the player (Mostly determines the sprite)
+        self.savestate = self.state
+        #The saved state of the player (Used to set anitimer to 0)
         self.anitimer = 0
+        #animation timer doohickey
     def getmap(self,idk):
         self.MID = idk
     def getinf(self):
@@ -290,8 +293,9 @@ class player:#THE PLAYER OF THE GAME
             self.bump = 5
     def draw(self, Screen, off, zoom = 1):
         self.anitimer += 1
-        if self.anitimer > 54:
+        if self.savestate != self.state:
             self.anitimer = 0
+        self.savestate = self.state
         if self.pound:
             pygame.draw.rect(Screen, (255,0,0), ((self.x*zoom-off[0])-2, (self.y*zoom-off[1])-2, self.xsize*zoom+4, self.ysize*zoom+4))
         if zoom == 1:
@@ -299,9 +303,13 @@ class player:#THE PLAYER OF THE GAME
             if self.state == "duck":
                 Screen.blit(pygame.transform.flip(playerduck, not self.lastDone, False), (self.rx-off[0]-20, self.ry-(off[1]+20)))
             elif self.pound:
-                Screen.blit(pygame.transform.flip(playertired, not self.lastDone, False),(self.rx-off[0]-16, self.ry-(off[1]+16)),(0,(self.anitimer//3)*64,64,64))
+                if self.anitimer > 54:
+                    self.anitimer = 0
+                Screen.blit(pygame.transform.flip(playertired, not self.lastDone, False),(self.rx-off[0]-16, self.ry-(off[1]+4)),(0,(self.anitimer//3)*64,64,64))
             else:
-                Screen.blit(pygame.transform.flip(playeridle, not self.lastDone, False), (self.rx-off[0]-20, self.ry-(off[1]+20)))
+                if self.anitimer > 48:
+                    self.anitimer = 0
+                Screen.blit(pygame.transform.flip(playeridle, not self.lastDone, False), (self.rx-off[0]-16, self.ry-(off[1]+4)),(0,(self.anitimer//3)*64,64,64))
         else:
             color = (100, 100, 100)
             if self.name == "w":

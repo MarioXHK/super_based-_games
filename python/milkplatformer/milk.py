@@ -44,8 +44,21 @@ offset = [0,0]
 dozooming = False #if true, zooming will be enabled
 #MAP: 1 is grass, 2 is brick
 
+#Image loading
 ground = pygame.image.load('tilesets/ground.png')
 ground = pygame.transform.scale(ground, (400,400))
+background = pygame.image.load('stylegrounds/back_ground.png')
+stars = pygame.image.load('stylegrounds/stars.png')
+background = pygame.transform.scale(background, (128,128))
+stars = pygame.transform.scale(stars, (128,128))
+
+#background function
+def stylethis(scream, image, SX,SY,H,V):
+    for b in range((0-SX)+(int(offset[0]//SX)*SX)-int(offset[0]),H,SX):
+        for d in range((0-SY)+(int(offset[1]//SY)*SY)-int(offset[1]),V,SY):
+            scream.blit(image, (b,d))
+
+
 players = [player(100,100,"w")]#THe player you play as
 p1dom = 1 #How much player 1 has dominance over scrolling
 zoom = 1
@@ -222,9 +235,16 @@ while gaming:
     
     #The part where things get put on the screen, aka --==XXXTHE RENDER SECTIONXXX==--
     zoomy = smooth(zoomy,zoom,"line",False, -0.05)
-    
+
     screen.fill((60,0,150)) #wipe screen so it doesn't smear
-    for i in range (len(map)):
+    
+    #BACKGROUNDS!!!!!
+
+    stylethis(screen, background, 320, 256, screenH, screenV)
+    
+
+    #Making the part that you touch with your playery!    
+    for i in range(len(map)):
         for j in range(len(map[0])):
             myx = (40*zoom)*j-offset[0]
             myy = (40*zoom)*i-offset[1]
