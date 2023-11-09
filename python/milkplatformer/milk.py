@@ -17,13 +17,12 @@ screen.fill((0,0,0))
 clock = pygame.time.Clock()#set up clock
 
 
-ms = Maps.getmapsize(0)
-print(ms)
+
 
 
 #Function to check if something is in view. If it isn't, it'll return false
-def checkifoff(ent,off,SH,SV):
-    return ent.x >= off[0]-100 and ent.y >= off[1]-100 and ent.x <= off[0]+(SH+100) and ent.y <= off[1]+(SV+100)
+def checkifoff(ent: tuple,off: list[float],SH: int,SV: int,csize: float = 100):
+    return ent[0] >= off[0]-csize and ent[1] >= off[1]-csize and ent[0] <= off[0]+(SH+csize) and ent[1] <= off[1]+(SV+csize)
 
 
 
@@ -49,14 +48,10 @@ ground = pygame.image.load('tilesets/ground.png')
 ground = pygame.transform.scale(ground, (400,400))
 background = pygame.image.load('stylegrounds/back_ground.png')
 stars = pygame.image.load('stylegrounds/stars.png')
-background = pygame.transform.scale(background, (128,128))
+background = pygame.transform.scale(background, (800,800))
 stars = pygame.transform.scale(stars, (128,128))
 
-#background function
-def stylethis(scream, image, SX,SY,H,V):
-    for b in range((0-SX)+(int(offset[0]//SX)*SX)-int(offset[0]),H,SX):
-        for d in range((0-SY)+(int(offset[1]//SY)*SY)-int(offset[1]),V,SY):
-            scream.blit(image, (b,d))
+
 
 
 players = [player(100,100,"w")]#THe player you play as
@@ -64,22 +59,28 @@ p1dom = 1 #How much player 1 has dominance over scrolling
 zoom = 1
 zoomy = 1
 maxdis = 600 #Max distance a player is allowed to be away from the other before they get pulled
-mapID = 0
+
+redo = False
+mapID = 1
+ms = Maps.getmapsize(mapID)
 map = Maps.getmap(mapID, False)
 print(Mapgen.scanspawn(Maps.getmap(mapID),9))
+enemies = []
+def do_enemies(entities: list, mid: int):
+    if mid == 0:
+        entities = [entity(760, 100,"bluewall"),entity(600, 600,"flyingplatform"),entity(400,  600,"fakeblock"),entity(560, 1300,"slime"),entity(720, 1080,"cherry"),entity(4280, 1480,"cheese"),entity(4280, 1480,"cherry"),entity(4180, 1480,"cherry"),entity(4080, 1480,"cherry"),entity(3980, 1480,"cherry"),entity(3880, 1480,"cherry")]
+    elif mapID == 1:
+        for a in range(100):
+            entities.append(entity(random.randint(500,4000), 1300,"cherry"))
+        for a in range(200):
+            entities.append(entity(random.randint(500,4000), 1400,"slime"))
+        for a in range(400):
+            entities.append(entity(random.randint(500,4000), 1000,"cheese"))
+    return entities
 
-enemies = [entity(760, 100,"bluewall"),entity(600, 600,"flyingplatform"),entity(400,  600,"fakeblock"),entity(560, 1300,"slime"),entity(720, 1080,"cherry"),entity(4280, 1480,"cheese"),entity(4280, 1480,"cherry"),entity(4180, 1480,"cherry"),entity(4080, 1480,"cherry"),entity(3980, 1480,"cherry"),entity(3880, 1480,"cherry")]
 
-"""
-for a in range(100):
-    enemies.append(entity(random.randint(500,4000), 1300,"cherry"))
-for a in range(200):
-    enemies.append(entity(random.randint(500,4000), 1400,"slime"))
-for a in range(400):
-    enemies.append(entity(random.randint(500,4000), 1000,"cheese"))
 for o in range(len(players)-1):
     keys.append(keys[0])
-"""
 
 
 for i in range(len(players)):
@@ -111,8 +112,17 @@ while gaming:
                 keys[0][6]=True
             if event.key == pygame.K_SPACE:
                 debug=True
-            if event.key == pygame.K_k:
-                kill=True
+            if debug:
+                if event.key == pygame.K_k:
+                    kill=True
+                if event.key == pygame.K_0:
+                    debug = False
+                    redo = True
+                    mapID = 0
+                elif event.key == pygame.K_1:
+                    debug = False
+                    redo = True
+                    mapID = 1
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 keys[0][0]=False
@@ -133,7 +143,18 @@ while gaming:
             if event.key == pygame.K_k:
                 kill=False
     clock.tick(60)
-    
+    if redo:
+        ms = Maps.getmapsize(mapID)
+        map = Maps.getmap(mapID, False)
+        redo = False
+        enemies = do_enemies(enemies, mapID)
+        for i in range(len(players)):
+            players[i].repos(100,100)
+            players[i].getmap(map)
+        for i in range(len(enemies)):
+            enemies[i].getmap(map)
+
+
     #PLAYER INPUT!!!
     
     for i in range(len(players)):
@@ -166,7 +187,7 @@ while gaming:
     uhm = 0
     for i in range(len(enemies)):
         g = i-uhm
-        if checkifoff(enemies[g],offset,screenH,screenV) or enemies[g].flang:
+        if checkifoff((enemies[g].x,enemies[g].y),offset,screenH,screenV) or enemies[g].flang:
             enemies[g].move()
             for j in range(len(players)):
                 if (thing.objcollision(players[j].getinf(),enemies[g].getinf(),0) and players[j].pound and not enemies[g].flang) or kill:
@@ -240,8 +261,6 @@ while gaming:
     
     #BACKGROUNDS!!!!!
 
-    stylethis(screen, background, 320, 256, screenH, screenV)
-    
 
     #Making the part that you touch with your playery!    
     for i in range(len(map)):
@@ -277,7 +296,7 @@ while gaming:
     for k in range(len(players)):
         players[k].draw(screen,offset,zoom)
     for i in range(len(enemies)):
-        if checkifoff(enemies[i],offset,screenH,screenV):
+        if checkifoff((enemies[i].x,enemies[i].y),offset,screenH,screenV):
             enemies[i].draw(screen,offset,zoom)
     if debug:
         pygame.draw.circle(screen,(255,0,0),(SHH,SHV),20)
