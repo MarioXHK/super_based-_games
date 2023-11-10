@@ -301,3 +301,4 @@ while gaming:
     if debug:
         pygame.draw.circle(screen,(255,0,0),(SHH,SHV),20)
     pygame.display.flip()
+pygame.quit()
