@@ -1,6 +1,6 @@
 import pygame
 pygame.init()  
-pygame.display.set_caption("Pizzalike Platformer")  # sets the window title
+pygame.display.set_caption("Trees")  # sets the window title
 screen = pygame.display.set_mode((1000, 1000))
 screen.fill((0,0,0))
 initSquarePos = [400,850]
@@ -28,9 +28,10 @@ def boringTree(Screen: pygame.Surface, points: list[list], iter: int, tripoint: 
 
         betweens = [inbetweenpoints((points[0][0],points[1][1]),(points[0][0],points[1][1]),tripoint[1])]
 
-        points[0][0] = savepoints[1][0]
+        
         points[0][1] = savepoints[1][1]
         boringTree()
+        points[0][0] = savepoints[1][0]
         points[0][1] = savepoints[1][1]
         boringTree()
 
