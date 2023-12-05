@@ -38,20 +38,10 @@ defstats = [
     [],
     []
 ]
-types = {
-"rock" : [0,3,11],
-"paper" : [1,4,8,9],
-"scissors" : [2,5,7,10],
-"aerial" : [1,4,5],
-"meat" : [0,6,9,15],
-"tech" : [14],
-"myth" : [12],
-"spirit" : [13],
-"physics" : [15]
-}
+
 
 class creature:
-    def __init__(self,id: int, lvl: int, wild: bool = False):
+    def __init__(self, id: int, lvl: int, wild: bool = False):
         global cnames
         global defstats
         self.name = cnames[id]
@@ -66,15 +56,14 @@ class creature:
         self.xp = int((self.lvl*5)**1.3)
         for i in range(lvl):
             for j in range(4):
-                k = random.randint(0,3)
+                k = random.randint(0,4)
                 if k == 0:
                     k = 2
                 self.stats[j] += k
         self.tempstats = self.stats
-    def printInfo(self):
+    def printInfo(self,types: dict):
         global cnames
         global cdescr
-        global types
         print(cnames[self.id], end = "")
         if cnames[self.id] != self.name:
             print(" \"" + self.name + "\"", end = "")
@@ -102,85 +91,90 @@ class creature:
         print("HP:", self.tempstats[0],"\nAttack:", self.tempstats[1],"\nDefense:", self.tempstats[2],"\nSpeed:", self.tempstats[3])
     def giveXP(self,amount):
         self.xp -= amount
-        if self.xp <= 0:
+        while self.xp <= 0:
             self.xp += int((self.lvl*5)**1.3)
             for j in range(4):
                 i = random.randint(0,3)
                 if i == 0:
                     i = 2
                 self.stats[j] += i
-    def attack(self,them,power) -> int:
-        global types
+    def attack(self,types: dict,them,power) -> int:
         crit = random.randint(1,6)
         if crit == 1:
             crit = 2
         else:
             crit = 1
         fd = (2*self.lvl)/5+2
-        sadamage = ((fd*power.p*(self.tempstats[1]/them.tempstats[2]))/5)*crit+2
+        if them.tempstats[2] <= 0: #Prevents Divide by 0 damage and assumes that this attack just instantly kills them
+            sadamage = 99999
+        else:
+            sadamage = ((fd*power.p*(self.tempstats[1]/them.tempstats[2]))/5)*crit+2
 
 
         #Types + weaknesses
 
-        if self.id in types["rock"]: #rock type
+        if "rock" in power.type: #rock type
             if them.id in types["scissors"] or them.id in types["aerial"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["paper"] or them.id in types["tech"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["paper"]: #paper type
+        if "paper" in power.type: #paper type
             if them.id in types["rock"] or them.id in types["spirit"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["scissors"] or them.id in types["aerial"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
                         
-        if self.id in types["scissors"]: #scissors type
+        if "scissors" in power.type: #scissors type
             if them.id in types["paper"] or them.id in types["meat"]:
-                sadamage *= 1.5
-            if them.id in types["scissors"] or them.id in types["aerial"] or them.id in types["tech"]:
-                sadamage *= 0.75
+                sadamage *= 1.2
+            if them.id in types["rock"] or them.id in types["aerial"] or them.id in types["tech"]:
+                sadamage *= 0.8
         
-        if self.id in types["aerial"]: #air type
+        if "aerial" in power.type: #air type
             if them.id in types["paper"] or them.id in types["physics"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["rock"] or them.id in types["scissors"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["meat"]: #meat type
+        if "meat" in power.type: #meat type
             if them.id in types["paper"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["rock"] or them.id in types["tech"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["tech"]: #tech type
+        if "tech" in power.type: #tech type
             if them.id in types["meat"] or them.id in types["physics"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["myth"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["myth"]: #mythic type
+        if "myth" in power.type: #mythic type
             if them.id in types["spirit"] or them.id in types["tech"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["physics"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["spirit"]: #spirit type
+        if "spirit" in power.type: #spirit type
             if them.id in types["spirit"] or them.id in types["paper"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["tech"] or them.id in types["meat"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
         
-        if self.id in types["physics"]: #spirit type
+        if "physics" in power.type: #spirit type
             if them.id in types["rock"] or them.id in types["meat"]:
-                sadamage *= 1.5
+                sadamage *= 1.2
             if them.id in types["tech"]:
-                sadamage *= 0.75
+                sadamage *= 0.8
 
         damage = sadamage + (random.randint((0-self.lvl),self.lvl)/2)
         
         return int(damage)
-        
+
+
 class move:
-    def __init__(self,power: int,specials: list = []):
+    def __init__(self,name: str,power: int,tipes: tuple,specials: list = []):
+        self.name = name
         self.p = power
+        self.type = tipes
         self.sa = specials #short for special abilities
