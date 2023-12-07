@@ -2,6 +2,7 @@ import pygame
 from buttons import button
 from interest import creature
 from interest import move
+import random
 
 pygame.init()  
 pygame.display.set_caption("Animals Fighting")  # sets the window title
@@ -39,20 +40,20 @@ movebasket = [#Regular Moves
               move("Wrestle",30,("normal","normal")),
               move("Triple-hit",35,("normal","normal")),
               move("Slam",40,("normal","normal")),
-              move("Sneak Attack",50,("normal","normal"),["self_stats",False,3,-10]),
+              move("Sneak Attack",50,("normal","normal"),[["self_stats",3,-10]]),
               move("Piledriver",60,("normal","normal")),
-              move("Ram",90,("normal","normal"),["self_stats",False,0,-20]),
+              move("Ram",90,("normal","normal"),[["self_stats",0,-20]]),
               move("A Swift Series of Attacks",100,("normal","normal")),
-              move("Kamikaze",200,("normal","normal"),["death"]),
+              move("Kamikaze",200,("normal","normal"),[["death"]]),
               #Rock Moves
               move("Rubble Throw",20,("rock","normal")),
               #Paper Moves
-              move("Reversorama",0,("paper","normal"),["reflect","all"]),
+              move("Reversorama",0,("paper","normal"),[["reflect","all"]]),
               move("Paper Cut",20,("paper","normal")),
               #Scissor Moves
               move("Spear Kick",20,("scissors","normal")),
               #Ariel Moves
-              move("Demodash",0,("aerial","normal"),["dodge"]),
+              move("Demodash",0,("aerial","normal"),[["dodge"]]),
               move("Breeze",10,("aerial","normal")),
               move("Giant Fan",15,("aerial","normal")),
               move("Dash",20,("aerial","normal")),
@@ -63,11 +64,11 @@ movebasket = [#Regular Moves
               move("Belly Flop",40,("meat","normal")),
               move("Body Slam",80,("meat","normal")),
               #Technical Moves
-              move("Extra Comma",0,("tech","normal"),["effect","stun",1]),
+              move("Extra Comma",0,("tech","normal"),[["effect","stun",1]]),
               move("Smart Stab",20,("tech","normal")),
               move("Minus Equals",30,("tech","normal")),
               move("Minus Equals",30,("tech","normal")),
-              move("A Kai Inspired Move",120,("tech","normal"),["death","effect","stun",1]),
+              move("A Kai Inspired Move",120,("tech","normal"),[["death"],["effect","stun",95]]),
               #Mythical Moves
               move("Magic Missile",20,("myth","normal")),
               #Spiritual Moves
@@ -76,6 +77,9 @@ movebasket = [#Regular Moves
               move("Goomba-Stomp",20,("physics","normal"))]
 
 testers = [creature(0,5),creature(1,5),creature(2,5)]
+battling = [creature(0,5,False,True),creature(1,5),creature(2,5)]
+
+battling[0].name = "Player"
 
 attackButton = button((0,200,0),(50,700,200,200),"Test",(0,0,0))
 
@@ -86,10 +90,10 @@ testers[0].printInfo(types)
 #testers[1].printInfo()
 #testers[2].printInfo()
 
-testers[0].printBattleInfo()
+testers[0].printBattleInfo(types)
 
 
-testers[1].printBattleInfo()
+testers[1].printBattleInfo(types)
 
 surviving = True
 while surviving:
@@ -108,6 +112,8 @@ while surviving:
     
     #Attack function *wink*
     if attackButton.tick(fire,mousePos):
+        
+       
         doAttack = True
         #Won't do any real damage if this is switched to false
         moveDid = defaultmove
@@ -122,45 +128,138 @@ while surviving:
                     break
             if moveDid == defaultmove and moveRequest != "a":
                 print("You don't have that move! If you want to use the regular default move, type in \"a\"")
-            elif moveDid.type[0] == "normal" or testers[0].id in types[moveDid.type[0]]:
+            elif moveDid.type[0] == "normal" or battling[0].id in types[moveDid.type[0]]:
                 cantProceed = False
             else:
                 print("This creature can't use that move!")
+        if len(battling) > 2:
+            cantProceed = True
+            target = battling[0]
+            while cantProceed:
+                print("Type the name of the creature you want to use this move on.")
+                for h in battling:
+                    print(h.name)
+                whoTo = input()
+                for r in battling:
+                    if whoTo == r.name:
+                        target = r
+                        cantProceed = False
+                        break
+        else:
+            for ip in battling:
+                if not ip.player:
+                    target = ip
+
         movebasket.remove(moveDid)
         
-        if moveDid.sa == []:
-            move_has_specials = True
-        else:
-            move_has_specials = False
-        #This will be very complicated for moves with special things
-        jn = 0
-        en = 0
-        #Jank number stands for jank number, Expected Number stands for Expected Number
-        while move_has_specials:
+        battling.sort(key=lambda x: x.tempstats[3], reverse=True)
+
+        reflect = ["nul","nil"]
+
+        for m in range(len(battling)):
+            print("MOVE", (m+1))
             
-            if moveDid.sa[jn] == "death":
-                en += 1
-                testers[0].tempstats[0] = 0
-            if en <= len(moveDid.sa):
-                move_has_specials = False
-            elif moveDid.sa[jn] == "self_stats":
-                en += 4
-                testers[0].tempstats[moveDid.sa[jn+2]] += moveDid.sa[jn+3]
-                if moveDid.sa[jn+1]:
-                    doAttack = False
-                jn += 4
+            t = 0
+            
+            if battling[m].tempstats[0] <= 0:
+                print(battling[m].name+ "'s down!")
+                continue
+            
+            if "stun" in battling[m].effects or "paralyze" in battling[m].effects:
+                print(battling[m].name, "can't move!")
+                battling[m].doEffect()
+                continue
+
+            if battling[m].player:
+                t = battling.index(target)
+                moveDoing = moveDid
             else:
-                jn += 1
+                #What non-player creatures do when attacking
+                cant = True
+                while cant:
+                    #Attacks a random creature
+                    t = random.randrange(0,len(battling))
+                    if battling[t] != battling[m]:
+                        cant = False
+                cant = True
+                while cant:
+                    #Uses a random move from the move basket
+                    moveDoing = random.choice(movebasket)
+                    if moveDoing.type[0] == "normal" or battling[m].id in types[moveDoing.type[0]]:
+                        cant = False
+
+            print("Creature attacking:", end = " ")
+            battling[m].printBattleInfo(types)
+            print("Targeted Creature:", end = " ")
+            battling[t].printBattleInfo(types)
 
 
+            print(battling[m].name, "uses", moveDoing.name)
 
-        if moveDid.p != 0 and doAttack:
-            testers[1].tempstats[0] -= testers[0].attack(types,testers[1],moveDid)
+            if moveDoing.sa == []:
+                move_has_specials = True
+            else:
+                move_has_specials = False
+            #This will be very complicated for moves with special things
 
+            #Specials (or Special attacks, thus .sa) are stored as a list within a list. Each list in the list specifies a specific special
+            #The first part of the list inside a list defined what exact special it is, and this for loop checks all the lists in the list
+            #inside the for loop itself is where the special stuff happens
+            
+            
+            
+            for smove in moveDoing.sa:
+                print(smove)
+                if smove[0] == "death":
+                    #Death only has 1 length. It simply turns the user's HP to 0
+                    battling[m].tempstats[0] = 0
+                elif smove[0] == "dont_attack":
+                    #Don't Attack only has 1 length. It makes it so damage is done
+                    doAttack = False
+                elif smove[0] == "chance":
+                    #Chance has a length of 2
+                    #The second value determines what the chance of the attack hitting is
+                    if random.randint(1,100) <= smove[2]:
+                        doAttack = False
+                        break
+                elif smove[0] == "stats":
+                    #(See Self Stats.)
+                    battling[t].tempstats[smove[1]] += smove[2]
+                elif smove[0] == "self_stats":
+                    #Self Stats has a length of 4. The second value determines what stat to effect
+                    #The third determines how much to add to it (This can of course be a negative)
+                    battling[m].tempstats[smove[1]] += smove[2]
+                elif smove[0] == "effect":
+                    #Effect has a length of 3. The second value is what effect is applied
+                    #The third value determines the chance of the effect going in percent
+                    if random.randint(1,100) <= smove[2]:
+                        if not (smove[1] in battling[t].effects):
+                            battling[t].effects.append(smove[1])
+                            battling[t].ecounter.append(random.randint(3,15))
+                        else:
+                            battling[t].ecounter[battling[t].effects.index(smove[1])] += random.randint(1,5)
+                elif smove[0] == "reflect":
+                    #Reflect (above) has a length of 2. The second value determines what types it can reflect
+                    doAttack = False
+                    #Reflect as a list has 2 values, the caster, and the type.
+                    reflect = [battling[m], smove[1]]
+
+            #this is the part where damage is actually done
+            
+            if moveDoing.p != 0 and doAttack:
+                dam = battling[m].attack(types,battling[t],moveDoing)
+                print("It deals", dam, "damage.")
+                if reflect[0] == battling[t] and (reflect[1] == "all" or reflect[1] in moveDoing.type):
+                    print("but the damage was reflected back to the attacker!")
+                    battling[m].tempstats[0] -= dam
+                battling[t].tempstats[0] -= dam
+            print("Creature attacking:", end = " ")
+            battling[m].printBattleInfo(types)
+            print("Targeted Creature:", end = " ")
+            battling[t].printBattleInfo(types)
+            battling[m].doEffect()
 
         
-        
-        testers[1].printBattleInfo()
     
     #Rendering is what I do!
     screen.fill((2,20,200))

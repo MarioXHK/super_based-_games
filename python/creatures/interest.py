@@ -41,13 +41,16 @@ defstats = [
 
 
 class creature:
-    def __init__(self, id: int, lvl: int, wild: bool = False):
+    def __init__(self, id: int, lvl: int, wild: bool = False,playing: bool = False):
         global cnames
         global defstats
         self.name = cnames[id]
         self.id = id
         self.lvl = lvl
         self.wild = wild
+        self.player = playing
+        self.effects = []
+        self.ecounter = []
         self.stats = defstats[id]
         if self.wild:
             self.lvl += random.randint(-5,5) 
@@ -67,7 +70,19 @@ class creature:
         print(cnames[self.id], end = "")
         if cnames[self.id] != self.name:
             print(" \"" + self.name + "\"", end = "")
-        print("\nLevel:", self.lvl,"\nXP till next level:", self.xp,"\nHP:", self.stats[0],"\nAttack:", self.stats[1],"\nDefense:", self.stats[2],"\nSpeed:", self.stats[3],"\nTypes:")
+        print("\nLevel:", self.lvl,"\nXP till next level:", self.xp,"\nHP:", self.stats[0],"\nAttack:", self.stats[1],"\nDefense:", self.stats[2],"\nSpeed:", self.stats[3],"\nTypes:", end = " ")
+        self.printTypes(types)
+        print("\nDescription:\n"+ cdescr[self.id])
+    
+    def printBattleInfo(self,types):
+        print(self.name, "HP:", self.tempstats[0], ", Attack:", self.tempstats[1], ", Defense:", self.tempstats[2], ", Speed:", self.tempstats[3], ", Type(s):", end = " ")
+        self.printTypes(types)
+        if len(self.effects) > 0:
+            print("Effects:", end = " ")
+            for i in range(len(self.effects)):
+                print(self.effects[i], "for", self.ecounter[i], "moves,")
+
+    def printTypes(self, types: dict):
         if self.id in types["rock"]:
             print("Rock,", end = " ")
         if self.id in types["paper"]:
@@ -86,9 +101,8 @@ class creature:
             print("Spiritual,", end = " ")
         if self.id in types["physics"]:
             print("Physics-based,", end = " ")
-        print("\nDescription:\n"+ cdescr[self.id])
-    def printBattleInfo(self):
-        print("HP:", self.tempstats[0],"\nAttack:", self.tempstats[1],"\nDefense:", self.tempstats[2],"\nSpeed:", self.tempstats[3])
+        print("\n")
+    
     def giveXP(self,amount):
         self.xp -= amount
         while self.xp <= 0:
@@ -170,10 +184,27 @@ class creature:
         damage = sadamage + (random.randint((0-self.lvl),self.lvl)/2)
         
         return int(damage)
+    def doEffect(self):
+        if "poison" in self.effects:
+            self.tempstats[0] -= int(self.stats[0]/8)
+        if "burning" in self.effects:
+            self.tempstats[0] -= int(self.stats[0]/4)
+        if "burning" in self.effects:
+            self.tempstats[0] -= int(self.stats[0]/4)
 
+        discardEffects = []
+        for i in range(len(self.effects)):
+            self.ecounter[i] -= 1
+            if self.ecounter[i] <= 0:
+                discardEffects.append(self.effects.index(self.effects[i]))
+                if self.effects[i] == "deathcounter":
+                    self.tempstats[0] = 0
+        for i in discardEffects:
+            del self.effects[i]
+            del self.ecounter[i]
 
 class move:
-    def __init__(self,name: str,power: int,tipes: tuple,specials: list = []):
+    def __init__(self,name: str,power: int,tipes: tuple,specials: list[list] = []):
         self.name = name
         self.p = power
         self.type = tipes
