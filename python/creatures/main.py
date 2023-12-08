@@ -29,8 +29,9 @@ mousePos = (0,0)
 fire = False
 tap = True
 defaultmove = move("Regular Attack",10,("normal","you"))
+throwmeaway = move("Regular Attack+",11,("normal","you"))
 
-movebasket = [#Regular Moves
+moveRepo = (#Regular Moves
               move("Light Slap",5,("normal","normal")),
               move("Claw",15,("normal","normal")),
               move("Slap",15,("normal","normal")),
@@ -46,14 +47,22 @@ movebasket = [#Regular Moves
               move("A Swift Series of Attacks",100,("normal","normal")),
               move("Kamikaze",200,("normal","normal"),[["death"]]),
               #Rock Moves
+              move("Intimidate",0,("rock","meat"),[["stats",2,-5]]),
               move("Rubble Throw",20,("rock","normal")),
+              move("Rock Rage",25,("rock","normal"),[["self_stats",1,10],["self_stats",2,-5]]),
+              move("Rock-hard punch",30,("rock","normal")),
+              move("Flint And Iron",35,("rock","normal")),
+              move("Catapult",40,("rock","normal")),
+              move("Meteor Strike",70,("rock","meat")),
               #Paper Moves
               move("Reversorama",0,("paper","normal"),[["reflect","all"]]),
               move("Paper Cut",20,("paper","normal")),
               #Scissor Moves
               move("Spear Kick",20,("scissors","normal")),
+              move("Axe Buster",30,("scissors","normal")),
               #Ariel Moves
               move("Demodash",0,("aerial","normal"),[["dodge"]]),
+              move("Meditation",0,("aerial","normal"),[["reflect","spirit"],["self_stats",0,10]]),
               move("Breeze",10,("aerial","normal")),
               move("Giant Fan",15,("aerial","normal")),
               move("Dash",20,("aerial","normal")),
@@ -64,17 +73,25 @@ movebasket = [#Regular Moves
               move("Belly Flop",40,("meat","normal")),
               move("Body Slam",80,("meat","normal")),
               #Technical Moves
-              move("Extra Comma",0,("tech","normal"),[["effect","stun",1]]),
+              move("Extra Comma",0,("tech","normal"),[["effect","stun",100]]),
+              move("Flashbang",10,("tech","normal"),[["effect","stun",55]]),
               move("Smart Stab",20,("tech","normal")),
               move("Minus Equals",30,("tech","normal")),
-              move("Minus Equals",30,("tech","normal")),
+              move("Rubber Tree Slam",35,("tech","normal")),
               move("A Kai Inspired Move",120,("tech","normal"),[["death"],["effect","stun",95]]),
               #Mythical Moves
+              move("Magic Missile",20,("myth","normal")),
               move("Magic Missile",20,("myth","normal")),
               #Spiritual Moves
               move("Jumpscare",20,("spirit","normal")),
               #Physics Moves
-              move("Goomba-Stomp",20,("physics","normal"))]
+              move("Goomba-Stomp",20,("physics","normal")))
+
+movebasket: list[move] = []
+
+for i in range(50):
+    movebasket.append(random.choice(moveRepo))
+
 
 testers = [creature(0,5),creature(1,5),creature(2,5)]
 battling = [creature(0,5,False,True),creature(1,5),creature(2,5)]
@@ -113,7 +130,8 @@ while surviving:
     #Attack function *wink*
     if attackButton.tick(fire,mousePos):
         
-       
+        movebasket.sort(key=lambda x: x.name, reverse=True)
+
         doAttack = True
         #Won't do any real damage if this is switched to false
         moveDid = defaultmove
@@ -121,7 +139,27 @@ while surviving:
         cantProceed = True
         #Makes sure you type in a valid move
         while cantProceed:
-            moveRequest = input("Type the name of the move you wanna use.\n")
+            print("Available Moves:")
+            previousoh = defaultmove
+            m = 1
+            for oh in movebasket:
+                if previousoh == oh:
+                    m += 1
+                else:
+                    print(previousoh.name, "(", previousoh.type[0], ")", end = "")
+                    if m != 1:
+                        print("("+str(m)+")", end = "")
+                    m = 1
+                    print(end = ", ")
+                previousoh = oh
+            else:
+                print(previousoh.name, end = "")
+                if m != 1:
+                    print("("+str(m)+")", end = "")
+                m = 1
+                print(end = ", ")
+
+            moveRequest = input("\nType the name of the move you wanna use.\n")
             for r in movebasket:
                 if moveRequest == r.name:
                     moveDid = r
@@ -150,7 +188,8 @@ while surviving:
                 if not ip.player:
                     target = ip
 
-        movebasket.remove(moveDid)
+        if moveDid != defaultmove:
+            movebasket.remove(moveDid)
         
         battling.sort(key=lambda x: x.tempstats[3], reverse=True)
 
@@ -225,10 +264,20 @@ while surviving:
                 elif smove[0] == "stats":
                     #(See Self Stats.)
                     battling[t].tempstats[smove[1]] += smove[2]
+                    if smove[1] == 0:
+                        if battling[t].tempstats[0] > battling[t].stats[0]:
+                            battling[t].tempstats[0] = battling[t].stats[0]
+                    elif battling[t].tempstats[smove[1]] <= 0:
+                        battling[t].tempstats[smove[1]] = 1
                 elif smove[0] == "self_stats":
-                    #Self Stats has a length of 4. The second value determines what stat to effect
+                    #Self Stats has a length of 3. The second value determines what stat to effect
                     #The third determines how much to add to it (This can of course be a negative)
                     battling[m].tempstats[smove[1]] += smove[2]
+                    if smove[1] == 0:
+                        if battling[m].tempstats[0] > battling[m].stats[0]:
+                            battling[m].tempstats[m] = battling[m].stats[0]
+                    elif battling[m].tempstats[smove[1]] <= 0:
+                        battling[m].tempstats[smove[1]] = 1
                 elif smove[0] == "effect":
                     #Effect has a length of 3. The second value is what effect is applied
                     #The third value determines the chance of the effect going in percent

@@ -1,6 +1,6 @@
 import random
 
-cnames = ("U","Flip","Metala","Transformed U","Flip Construct","Royapi","Toito","Bee","Noteling","Shapebro","Sharpbro","Icingbro","Lucking","Unlucking","Metalface")
+cnames = ("U","Flip","Metala","Transformed U","Flip Construct","Royapi","Toito","Bee","Noteling","Shapebro","Sharpbro","Icingbro","Lucking","Unlucking","Metalface","Sand Octipus")
 
 cdescr = ("The U are a perculiar species that enhabit just about\nevery place sunlight can see. Coming in many different\nshapes and sizes, they have a variety\nof abilities, however you got a regular U.\n",
           "Flips are often found in abandoned office buildings\nsince they have an abundance of paper there.\nFlips are formed from special flip particles landing on\nfoldable paper, which then folds to form the flip shape.\n",
@@ -16,7 +16,8 @@ cdescr = ("The U are a perculiar species that enhabit just about\nevery place su
           "Icingbros are shapebros that are a lil different and\nthus are socially isolated from every other one of it's kind.\nIt's a pure survival machine because\nof this, and it would probably do a murder.\n",
           "Luckings are products of the giant luck structure in\nthe sky. They try and bring luck and joy to all the good\nboys and girls. Because of their lucky effects\nthey aren't actually a part of the food\nchain since everyone, even carnivores\nwant a piece of dat luck.\n",
           "Unluckings are products of the giant unluck structure\nin the sky. They go around scaring everyone and\nruining the luck of people. Because of this\nthey aren't welcome in any ecosystem, but nobody's\n afraid of kicking them out, since they\nmight just run out of luck.",
-          "Metalfaces are usually on the front of important\nbuildings. They guard and frown upon those who dare enter\nwithout permission.\n")
+          "Metalfaces are usually on the front of important\nbuildings. They guard and frown upon those who dare enter\nwithout permission.\n",
+          "Sand Octopi are Octopi that have adapted to spit\nsand at their foes.")
 
 defstats = [
     [23,16,12,19], #0: the U
@@ -31,10 +32,10 @@ defstats = [
     [18,10,13,14], #9: Shapebros
     [18,17,12,11], #10: Sharpbros
     [16,13,20,18], #11: Icingbros
-    [], #12: Luckings
-    [], #13: Unluckings
-    [], #14: Metalfaces
-    [], #15: Sand Octopuses
+    [12,16,17,20], #12: Luckings
+    [15,20,12,11], #13: Unluckings
+    [16,10,24,8], #14: Metalfaces
+    [20,11,17,23], #15: Sand Octopi
     [],
     []
 ]
